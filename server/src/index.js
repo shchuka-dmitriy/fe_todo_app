@@ -1,12 +1,16 @@
-const { User } = require('./db/models');
-const bcrypt = require('bcrypt');
+import { User, sequelize } from './db/models';
+import { Model, DataTypes } from 'sequelize';
+import moment from 'moment';
 
 /*
+const bcrypt = require('bcrypt');
+
+/!*
 * createUser
 * getUserById
 * updateUser
 * deleteUser
-* */
+* *!/
 
 const hashPassword = async (password) => {
 	try {
@@ -40,7 +44,9 @@ const getUserById = async (userId) => {
 	}
 };
 
-/*createUser({
+
+
+/!*createUser({
 			   firstName: 'Name',
 			   lastName: 'Surname',
 			   email: 'test13@gmail.com',
@@ -48,8 +54,44 @@ const getUserById = async (userId) => {
 			   password: 'test123456'
 		   })
 	.then(console.log)
-	.catch(console.err);*/
+	.catch(console.err);*!/
 
 getUserById(1)
 	.then(console.log)
-	.catch(console.err);
+	.catch(console.err);*/
+
+class Task extends Model {
+
+
+}
+
+Task.init({
+			  value: {
+				  type: DataTypes.STRING,
+				  allowNull: true,
+				  validate: {
+					  notEmpty: true,
+				  }
+			  },
+			  deadline: {
+				  type: DataTypes.DATE,
+				  allowNull: false,
+				  validate: {
+					  isDate: true,
+					  isAfter: new Date(),
+				  }
+			  },
+			  isDone: {
+				  type: DataTypes.BOOLEAN,
+				  defaultValue: false,
+				  allowNull: false
+			  }
+		  },
+
+		  {
+			  sequelize,
+			  timestamps: true
+		  });
+
+Task.belongsTo(User);
+User.hasMany(Task);

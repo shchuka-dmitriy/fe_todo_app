@@ -1,4 +1,8 @@
+/*работа с таблицами*/
+
 'use strict';
+import bcrypt from 'bcrypt';
+
 module.exports = (sequelize, DataTypes) => {                  /*экспортируем ф-цию которая возвращает модель*/
   const User = sequelize.define('User', {
     firstName: {
@@ -30,9 +34,17 @@ module.exports = (sequelize, DataTypes) => {                  /*экспорти
         len: [6,16]                       /*размер от 6 до 16*/
       }
     },
-    passwordHash: {
+    // passwordHash: {
+    //   type: DataTypes.STRING,
+    //   allowNull: false
+    // },
+    password: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+      field: 'passwordHash',
+      set (val) {
+        this.setDataValue('password', bcrypt.hashSync( val, 10));
+      }
     }
   }, {});
   User.associate = function(models) {
