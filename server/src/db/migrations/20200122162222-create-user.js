@@ -4,7 +4,7 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Users', {
+    return queryInterface.createTable( 'Users', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -12,25 +12,25 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       firstName: {
-        type: Sequelize.STRING(64),
-        allowNull: false
+        type: Sequelize.STRING( 64 ),
+        allowNull: false,
       },
       lastName: {
-        type: Sequelize.STRING(64),
-        allowNull: false
+        type: Sequelize.STRING( 64 ),
+        allowNull: false,
       },
       email: {
         type: Sequelize.STRING,
-        unique: true
+        unique: true,
       },
       login: {
-        type: Sequelize.STRING(16),
+        type: Sequelize.STRING( 16 ),
+        unique: true,
         allowNull: false,
-        unique: true
       },
       passwordHash: {
         type: Sequelize.TEXT,
-        allowNull: false
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,
@@ -40,9 +40,9 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
-    });
+    } );
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Users');
+    return queryInterface.dropTable( 'Users' );
   }
 };
