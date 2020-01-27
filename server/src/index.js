@@ -97,65 +97,137 @@
  Task.belongsTo(User);
  User.hasMany(Task);*/
 
-
 /*
  import { User, sequelize } from './db/models' ;
 
  User.findAll( {} ).then( data => console.log( data.map( user => user.toJSON() ) ) );*/
 
+/*
+ import { User, Task } from './db/models';
+ import Sequelize      from 'sequelize';
 
-import { User, Task } from './db/models';
-import Sequelize      from 'sequelize';
+ const Op = Sequelize.Op;									//для запросов. Почитать на sequelize.org/v5/manual ...
 
-const Op = Sequelize.Op;									//для запросов. Почитать на sequelize.org/v5/manual ...
+ async function getTasksWithOwners () {
+ try {
+ const tasks = await Task.findAll(
+ {
+ limit: 10,
+ where: {
+ isDone: true
+ },
+ id: {
+ [Op.between]: [400,500]					//дополнительные options к выборке
+ },
+ include: [
+ {
+ model: User,
+ as: 'owner'													//выводим как owner (владелец таски). Этот псевдоним мы дали юзеру в models/user.js
+ }]
+ } );
+ return tasks.map( task => task.get() );
+ } catch (e) {
 
-async function getTasksWithOwners () {
+ }
+ }
+
+ async function getUsersWithTasks () {
+ try {
+ const result = await User.findAll( {
+ limit: 10,
+ attributes: {
+ exclude: ['password']			//вывести без поля password
+ },
+ include: [
+ {
+ model: Task,							//включая модель Task будут выводиться и таски у юзеров. Без этого поле Tasks у юзеров выводиться не будет
+ as: 'tasks'
+ }
+ ]
+ } );
+
+ return result.map( item => item.get() );
+ } catch (e) {
+
+ }
+ }
+
+ // getUsersWithTasks()
+ //   .then( console.log );
+
+
+ getTasksWithOwners()
+ .then( console.log );*/
+
+/*
+//транзакции
+import { CreditCard, sequelize } from './db/models';
+
+async function transaction (fromCardId, toCardId, value) {
   try {
-    const tasks = await Task.findAll(
-      {
-				limit: 10,
-        where: {
-          isDone: true
-        },
-				id: {
-					[Op.between]: [400,500]					//дополнительные options к выборке
-				},
-        include: [
-          {
-            model: User,
-            as: 'owner'													//выводим как owner (владелец таски). Этот псевдоним мы дали юзеру в models/user.js
-          }]
-      } );
-    return tasks.map( task => task.get() );
-  } catch (e) {
 
+    const fromCard = await CreditCard.findByPk( fromCardId );
+    const toCard = await CreditCard.findByPk( toCardId );
+
+    console.group( 'BEFORE' );
+    console.log( fromCard.get() );
+    console.log( toCard.get() );
+    console.groupEnd();
+
+    const t = await sequelize.transaction();
+
+    fromCard.balance -= value;
+    const updatedFromCard = await fromCard.save( {
+                                                   transaction: t,
+                                                 } );
+
+    toCard.balance += value;
+    const updatedToCard = await toCard.save( {
+                                               transaction: t,
+                                             } );
+
+    await t.commit();
+
+    console.group( 'AFTER' );
+    console.log( updatedFromCard.get() );
+    console.log( updatedToCard.get() );
+    console.groupEnd();
+
+  } catch (e) {
+    console.error( e );
   }
 }
 
-async function getUsersWithTasks () {
-  try {
-    const result = await User.findAll( {
-                                         limit: 10,
-                                         attributes: {
-                                           exclude: ['password']			//вывести без поля password
-                                         },
-                                         include: [
-                                           {
-                                             model: Task,							//включая модель Task будут выводиться и таски у юзеров. Без этого поле Tasks у юзеров выводиться не будет
-                                             as: 'tasks'
-                                           }
-                                         ]
-                                       } );
+transaction( 1, 2, 100 );*/
 
-    return result.map( item => item.get() );
-  } catch (e) {
 
+
+//СЕРВЕР!. работа с express
+import express from 'express';
+import {User} from './db/models';
+
+const app = express();              //ф-ция создает экземпяер сервера. app - сервер
+const PORT = process.env.PORT || 5000;                 //process.env.PORT - значение порта из файла .env
+
+app.use(express.json());            //подключили, чтобы могли парсить json из body
+
+app.get('/'/* запрос в корень сервака */, (req, res)/* ф-ция промежуточной обработки */ => res.send('Hello World! Hi'));   //тут как обрабатывать get-запрос
+
+app.post('/user'/* запрос на юзера */, async (req, res, next) => {
+  try{
+  // console.log(req.body);
+
+    const createdUser = await User.create(req.body);
+
+    res.send(createdUser);
+
+  }catch (e) {
+    console.error(e)
   }
-}
+});
 
-// getUsersWithTasks()
-//   .then( console.log );
+app.use((err, req, res) => {
+  res.status(500).send("Something broken!");
+});
 
-
-getTasksWithOwners()
-  .then( console.log );
+app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`));

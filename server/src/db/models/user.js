@@ -43,7 +43,7 @@ module.exports = (sequelize, DataTypes) => {                  /*экспорти
       allowNull: false,
       field: 'passwordHash',
       set (val) {
-        this.setDataValue( 'password', bcrypt.hashSync( val, 10 ) );
+        this.setDataValue( 'password', bcrypt.hash( val, 10 ) );
       }
     }
   }, {} );

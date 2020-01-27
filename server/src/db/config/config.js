@@ -7,8 +7,8 @@ module.exports = {
 		database: process.env.DB_NAME,
 		host: process.env.DB_HOST,
 		dialect: 'postgres',
-		migrationStorage: "json",			//для того чтобы не было таблички SequelizeMeta, а инфа о миграциях и т.д. хранилась бы в json. Нужно чтоб если ктонибудь будет не через sequelize с проектом работать
-		seederStorage: "json"				//для того чтобы не было таблички SequelizeMeta, а инфа о сидах и т.д. хранилась бы в json
+		migrationStorage: 'json',			//для того чтобы не было таблички SequelizeMeta, а инфа о миграциях и т.д. хранилась бы в json. Нужно чтоб если ктонибудь будет не через sequelize с проектом работать
+		seederStorage: 'json'				//для того чтобы не было таблички SequelizeMeta, а инфа о сидах и т.д. хранилась бы в json
 },
 	test: {},
 	production: {}
