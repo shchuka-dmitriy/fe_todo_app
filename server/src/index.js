@@ -1,3 +1,5 @@
+/*--  Это Сервер  --*/
+
 /*
  import { User, sequelize } from './db/models';
  import { Model, DataTypes } from 'sequelize';
@@ -160,74 +162,88 @@
  .then( console.log );*/
 
 /*
-//транзакции
-import { CreditCard, sequelize } from './db/models';
+ //транзакции
+ import { CreditCard, sequelize } from './db/models';
 
-async function transaction (fromCardId, toCardId, value) {
-  try {
+ async function transaction (fromCardId, toCardId, value) {
+ try {
 
-    const fromCard = await CreditCard.findByPk( fromCardId );
-    const toCard = await CreditCard.findByPk( toCardId );
+ const fromCard = await CreditCard.findByPk( fromCardId );
+ const toCard = await CreditCard.findByPk( toCardId );
 
-    console.group( 'BEFORE' );
-    console.log( fromCard.get() );
-    console.log( toCard.get() );
-    console.groupEnd();
+ console.group( 'BEFORE' );
+ console.log( fromCard.get() );
+ console.log( toCard.get() );
+ console.groupEnd();
 
-    const t = await sequelize.transaction();
+ const t = await sequelize.transaction();
 
-    fromCard.balance -= value;
-    const updatedFromCard = await fromCard.save( {
-                                                   transaction: t,
-                                                 } );
+ fromCard.balance -= value;
+ const updatedFromCard = await fromCard.save( {
+ transaction: t,
+ } );
 
-    toCard.balance += value;
-    const updatedToCard = await toCard.save( {
-                                               transaction: t,
-                                             } );
+ toCard.balance += value;
+ const updatedToCard = await toCard.save( {
+ transaction: t,
+ } );
 
-    await t.commit();
+ await t.commit();
 
-    console.group( 'AFTER' );
-    console.log( updatedFromCard.get() );
-    console.log( updatedToCard.get() );
-    console.groupEnd();
+ console.group( 'AFTER' );
+ console.log( updatedFromCard.get() );
+ console.log( updatedToCard.get() );
+ console.groupEnd();
 
-  } catch (e) {
-    console.error( e );
-  }
-}
+ } catch (e) {
+ console.error( e );
+ }
+ }
 
-transaction( 1, 2, 100 );*/
+ transaction( 1, 2, 100 );*/
 
+/*
+ //СЕРВЕР!. работа с express. Примеры запросов.
+ import express  from 'express';
+ import { User } from './db/models';
 
+ const app = express();              //ф-ция создает экземпяер сервера. app - сервер
+ const PORT = process.env.PORT || 5000;                 //process.env.PORT - значение порта из файла .env
 
-//СЕРВЕР!. работа с express
-import express from 'express';
-import {User} from './db/models';
+ app.use( express.json() );            //подключили, чтобы могли парсить json из body
 
-const app = express();              //ф-ция создает экземпяер сервера. app - сервер
-const PORT = process.env.PORT || 5000;                 //process.env.PORT - значение порта из файла .env
+ app.get( '/'/!* запрос в корень сервака *!/,
+ (req, res)/!* ф-ция промежуточной обработки *!/ => res.send( 'Hello World! Hi' )
+ );   //тут как обрабатывать get-запрос
 
-app.use(express.json());            //подключили, чтобы могли парсить json из body
+ app.post( '/user'/!* запрос на юзера *!/, async (req, res, next) => {
+ try {
+ // console.log(req.body);
 
-app.get('/'/* запрос в корень сервака */, (req, res)/* ф-ция промежуточной обработки */ => res.send('Hello World! Hi'));   //тут как обрабатывать get-запрос
+ const createdUser = await User.create( req.body );
 
-app.post('/user'/* запрос на юзера */, async (req, res, next) => {
-  try{
-  // console.log(req.body);
+ res.send( createdUser );
 
-    const createdUser = await User.create(req.body);
+ } catch (e) {
+ next(e);
+ }
+ } );
 
-    res.send(createdUser);
+ app.use( (err, req, res) => {
+ res.status( 500 ).send( 'Something broken!' );
+ } );
 
-  }catch (e) {
-    console.error(e)
-  }
-});
+ app.listen( PORT, () => console.log( `Example app listening on port ${PORT}!` ) );*/
 
-app.use((err, req, res) => {
-  res.status(500).send("Something broken!");
-});
+//СЕРВЕР!. работа с express2 с роутером.
+import express      from 'express';
+import router       from './routes';
+import errorHandler from './middlewares/errorHandler.js';
 
-app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`));
+const app = express();
+const PORT = process.env.PORT || 5000;
+app.use( express.json() );
+app.use( router );                  //кидаем на основной роутер, а он перенаправляет на другие под-роутеры
+router.use(errorHandler);
+
+app.listen( PORT, () => console.log( `Example app listening on port ${PORT}!` ) );

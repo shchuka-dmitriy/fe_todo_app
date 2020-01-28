@@ -1,7 +1,9 @@
 /*работа с таблицами*/
 
 'use strict';
-import bcrypt from 'bcrypt';
+import { LOGIN_PATTERN } from '../../constants';
+
+const bcrypt = require( 'bcrypt' );
 
 module.exports = (sequelize, DataTypes) => {                  /*экспортируем ф-цию которая возвращает модель*/
   const User = sequelize.define( 'User', {
@@ -31,19 +33,20 @@ module.exports = (sequelize, DataTypes) => {                  /*экспорти
       allowNull: false,
       unique: true,
       validate: {
+        is: LOGIN_PATTERN,
         len: [6, 16]                       /*размер от 6 до 16*/
       }
     },
     /*    passwordHash: {
-          type: DataTypes.STRING,
-          allowNull: false
+     type: DataTypes.STRING,
+     allowNull: false
      },*/
     password: {
       type: DataTypes.STRING,
       allowNull: false,
       field: 'passwordHash',
       set (val) {
-        this.setDataValue( 'password', bcrypt.hash( val, 10 ) );
+        this.setDataValue( 'password', bcrypt.hashSync( val, 10 ) );
       }
     }
   }, {} );
@@ -56,9 +59,9 @@ module.exports = (sequelize, DataTypes) => {                  /*экспорти
       as: 'tasks'                             //даем массиву с тасками псевдоним tasks и его используем в index.js в findAll
 
       /*as: {
-            plural: 'task',                  //так указываем какой псевдоним брать - когда таски в единственном числе то task, когда во множественном то tasks
-            singular: 'tasks'
-      }*/
+       plural: 'task',                  //так указываем какой псевдоним брать - когда таски в единственном числе то task, когда во множественном то tasks
+       singular: 'tasks'
+       }*/
 
     } );
   };
