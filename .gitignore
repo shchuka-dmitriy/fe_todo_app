@@ -4,3 +4,4 @@
 **/.env
 **/server/sequelize-meta.json
 **/server/sequelize-data.json
+/sandbox/
