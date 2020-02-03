@@ -1,30 +1,33 @@
 import express                                                     from 'express';
 import { createUser, deleteUserByPk, getUserByPk, updateUserByPk } from '../controllers/user.controller.js';
-import { validateUserOnCreate, validateUserOnUpdate }              from '../middlewares/user/validateUser.js';
-import checkPermissions                                            from '../middlewares/permission/checkPermissions.js';
-import { ACTION, ENTITY }                                          from '../constants';
-import schemas                                                     from '../utils/validation';
+import createValidationMW
+                                                                   from '../middlewares/validation/createValidationMW.js';
+import schemas            from '../utils/validation';
+import checkPermissions   from '../middlewares/permission/createPermissions.js';
+import { ACTION, ENTITY } from '../constants';
 
 const userRouter = express.Router();
-const checkUserPermissions = checkPermissions( ENTITY.USER );
+
+const createUserPermissions = checkPermissions( ENTITY.USER );
+const createUserValidationMW = createValidationMW(schemas.userSchema);
 
 userRouter.post( '/',
-                 checkUserPermissions( ACTION.CREATE ),
-                 validateUserOnCreate,
+                 createUserPermissions( ACTION.CREATE ),
+                 createUserValidationMW( ACTION.CREATE ),
                  createUser
 );
 userRouter.patch( '/:userId',
-                  checkUserPermissions( ACTION.UPDATE ),
-                  validateUserOnUpdate,
+                  createUserPermissions( ACTION.UPDATE ),
+                  createUserValidationMW( ACTION.UPDATE ),
                   updateUserByPk
 );
 userRouter.get( '/:userId',
-                checkUserPermissions( ACTION.READ ),
+                createUserPermissions( ACTION.READ ),
                 getUserByPk
 );
 
 userRouter.delete( '/:userId',
-                   checkUserPermissions( ACTION.DELETE ),
+                   createUserPermissions( ACTION.DELETE ),
                    deleteUserByPk
 );
 

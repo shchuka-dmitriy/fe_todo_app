@@ -1,4 +1,4 @@
-/*работа с таблицами*/
+/*работа с таблицами. Это абстракция таблицы в коде. Нужна чтобы силами js меняли в ней значения*/
 
 'use strict';
 
@@ -61,6 +61,9 @@ module.exports = (sequelize, DataTypes) => {    /*экспортируем ф-ц
        singular: 'tasks'
        }*/
     } );
+    User.belongsToMany(models.Role, {
+      through: 'UserRoles',                          /*связь многие ко многим ЧЕРЕЗ таблицу UserRoles*/
+    })
   };
   return User;
 };

@@ -1,29 +1,30 @@
-import express             from 'express';
+import express            from 'express';
+import createValidationMW from '../middlewares/validation/createValidationMW.js';
+import schemas            from '../utils/validation';
 import * as TaskController from '../controllers/task.controller.js';
-import createValidationMW  from '../middlewares/validation/';
-import schemas             from '../utils/validation';
+import createPermissions    from '../middlewares/permission/createPermissions.js';
 import { ACTION, ENTITY }  from '../constants';
-import checkPermissions    from '../middlewares/permission/checkPermissions.js';
 
 const taskRouter = express.Router();
-const checkTaskPermissions = checkPermissions( ENTITY.TASK );
+
+const createTaskPermissions = createPermissions( ENTITY.TASK );
 
 taskRouter.post( '/',
-                 checkTaskPermissions( ACTION.CREATE ),
+                 createTaskPermissions( ACTION.CREATE ),
                  createValidationMW( schemas.taskSchema )(),
-                 TaskController.createTask
-);
-taskRouter.patch( '/:taskId',
-                  checkTaskPermissions( ACTION.READ ),
-                  createValidationMW( schemas.taskSchema )( false ),
-                  updateTask
+                 TaskController.createTask,
 );
 taskRouter.get( '/:taskId',
-                checkTaskPermissions( ACTION.UPDATE ),
+                createTaskPermissions( ACTION.READ ),
                 TaskController.getTask
 );
+taskRouter.patch( '/:taskId',
+                  createTaskPermissions( ACTION.UPDATE ),
+                  createValidationMW( schemas.taskSchema )( ACTION.UPDATE ),
+                  TaskController.updateTask
+);
 taskRouter.delete( '/:taskId',
-                   checkTaskPermissions( ACTION.DELETE ),
+                   createTaskPermissions( ACTION.DELETE ),
                    TaskController.deleteTask
 );
 
