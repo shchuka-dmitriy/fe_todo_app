@@ -5,6 +5,23 @@ export const PASSWORD_PATTERN = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?\d)[A-Za-z0-9_@#
 /*для Permissions:*/
 
 /*@typedef {Symbol} ActionTyp - прописываем свой тип*/
+
+
+/**
+ * @typedef {String} RoleType
+ */
+
+/**
+ * @readonly
+ * @enum {RoleType}
+ */
+export const ROLE = Object.freeze( {
+                                     USER: 'USER',
+                                     ADMIN: 'ADMIN',
+                                     MODERATOR: 'MODERATOR'
+                                   } );
+
+
 /**
  * @typedef {Symbol} ActionType
  */
@@ -33,16 +50,3 @@ export const ENTITY = Object.freeze( {
                                        TASK: Symbol( 'TASK' ),
                                      } );
 
-/**
- * @typedef {String} RoleType
- */
-
-/**
- * @readonly
- * @enum {RoleType}
- */
-export const ROLE = Object.freeze( {
-                                     USER: 'USER',
-                                     ADMIN: 'ADMIN',
-                                     MODERATOR: 'MODERATOR'
-                                   } );
